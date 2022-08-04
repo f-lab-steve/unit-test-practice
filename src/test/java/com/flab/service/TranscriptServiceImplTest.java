@@ -220,7 +220,11 @@ class TranscriptServiceImplTest {
     @Test
     @DisplayName("courseRepository에서 입력으로 주어진 courseID로 course를 조회할 수 없으면 NoSuchCourseException을 Throw 한다.")
     void testGetRankedStudentsAsc_CourseNotExist_ThrowNoSuchCourseException_Error() {
-        // TODO:
-        throw new UnsupportedOperationException("Not implemented yet");
+        //given
+        Mockito.when(courseRepository.getCourse(1))
+                .thenReturn(Optional.empty());
+
+        // when & then
+        Assertions.assertThrows(NoSuchCourseException.class, () -> transcriptService.getRankedStudentsAsc(1));
     }
 }
