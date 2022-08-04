@@ -1,5 +1,6 @@
 package com.flab.service;
 
+import com.flab.exception.NoSuchCourseException;
 import com.flab.exception.NoSuchScoreException;
 import com.flab.exception.NoSuchStudentException;
 import com.flab.model.Course;
@@ -19,8 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 class TranscriptServiceImplTest {
@@ -150,8 +150,71 @@ class TranscriptServiceImplTest {
     @Test
     @DisplayName("getRankedStudentAsc()를 호출하면, 입력으로 주어진 course를 수강하는 모든 학생들의 리스트를 성적의 내림차순으로 리턴한다.")
     void testGetRankedStudentsAsc_HappyCase_VerifyReturnedValueAndInteractions_Success() {
-        // TODO:
-        throw new UnsupportedOperationException("Not implemented yet");
+        // given
+        final int studentID = 1;
+        final Student trey = new Student().setId(studentID).setName("Trey").setMajor("Computer Engineering")
+                .setCourses(List.of(KOREAN, ENGLISH));
+        final int studentID2 = 2;
+        final Student cyh = new Student().setId(studentID2).setName("cyh").setMajor("Computer Engineering")
+                .setCourses(List.of(KOREAN, ENGLISH));
+        final int studentID3 = 3;
+        final Student foo = new Student().setId(studentID3).setName("foo").setMajor("Computer Engineering")
+                .setCourses(List.of(KOREAN, ENGLISH));
+
+        Mockito.when(courseRepository.getCourse(1))
+                .thenReturn(Optional.of(KOREAN));
+        Mockito.when(courseRepository.getCourse(2))
+                .thenReturn(Optional.of(ENGLISH));
+
+        //when
+        Map<Integer,Score> studentIDToScore = new HashMap<>();
+        studentIDToScore.put(studentID, new Score().setCourse(KOREAN).setScore(10));
+        studentIDToScore.put(studentID2, new Score().setCourse(KOREAN).setScore(20));
+        studentIDToScore.put(studentID3, new Score().setCourse(KOREAN).setScore(30));
+
+        Mockito.when(scoreRepository.getScores(1))
+                .thenReturn(studentIDToScore);
+        Mockito.when(scoreRepository.getScores(1))
+                .thenReturn(studentIDToScore);
+        Mockito.when(scoreRepository.getScores(1))
+                .thenReturn(studentIDToScore);
+
+
+        Map<Integer,Score> studentIDToScore2 = new HashMap<>();
+        studentIDToScore2.put(studentID, new Score().setCourse(ENGLISH).setScore(90));
+        studentIDToScore2.put(studentID2, new Score().setCourse(ENGLISH).setScore(80));
+        studentIDToScore2.put(studentID3, new Score().setCourse(ENGLISH).setScore(70));
+
+        Mockito.when(scoreRepository.getScores(2))
+                .thenReturn(studentIDToScore2);
+        Mockito.when(scoreRepository.getScores(2))
+                .thenReturn(studentIDToScore2);
+        Mockito.when(scoreRepository.getScores(2))
+                .thenReturn(studentIDToScore2);
+
+        //2 when
+        List<Student> studentsList = new ArrayList<>();
+        studentsList.add(trey);
+        studentsList.add(cyh);
+        studentsList.add(foo);
+        Mockito.when(studentRepository.getAllStudents())
+                .thenReturn(studentsList);
+
+        // then
+        List<Student> rankedStudentsList = transcriptService.getRankedStudentsAsc(1);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < rankedStudentsList.size(); i++) {
+            sb.append(rankedStudentsList.get(i).getId() + " ");
+        }
+        Assertions.assertEquals(String.valueOf(sb),"3 2 1 ");
+
+
+        List<Student> rankedStudentsList2 = transcriptService.getRankedStudentsAsc(2);
+        StringBuilder sb2 = new StringBuilder();
+        for (int i = 0; i < rankedStudentsList2.size(); i++) {
+            sb2.append(rankedStudentsList2.get(i).getId() + " ");
+        }
+        Assertions.assertEquals(String.valueOf(sb2), "1 2 3 ");
     }
 
     @Test
