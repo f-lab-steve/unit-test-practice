@@ -27,6 +27,9 @@ test {
     useJUnitPlatform()
     finalizedBy jacocoTestReport
 }
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
+}
 
 jacocoTestReport {
     dependsOn test
