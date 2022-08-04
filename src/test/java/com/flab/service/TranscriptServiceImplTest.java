@@ -1,5 +1,6 @@
 package com.flab.service;
 
+import com.flab.exception.NoSuchScoreException;
 import com.flab.exception.NoSuchStudentException;
 import com.flab.model.Course;
 import com.flab.model.Score;
@@ -105,7 +106,7 @@ class TranscriptServiceImplTest {
         Assertions.assertEquals(85, transcriptService.getAverageScore(studentID));
 
 
-        // given
+        //2 given
         final Student cyh = new Student().setId(studentID).setName("cyh").setMajor("Computer Engineering")
                 .setCourses(List.of(KOREAN, ENGLISH, MATH));
 
@@ -119,7 +120,7 @@ class TranscriptServiceImplTest {
         Mockito.when(scoreRepository.getScore(studentID, 3))
                 .thenReturn(Optional.of(new Score().setCourse(MATH).setScore(80)));
 
-        //when & then
+        //2 when & then
         Assertions.assertEquals(90, transcriptService.getAverageScore(studentID));
 
 
@@ -140,16 +141,10 @@ class TranscriptServiceImplTest {
                 .thenReturn(Optional.of(trey));
 
         Mockito.when(scoreRepository.getScore(studentID, 1))
-                .thenReturn(Optional.of(new Score().setCourse(KOREAN).setScore(100)));
-        Mockito.when(scoreRepository.getScore(studentID, 2))
-                .thenReturn(Optional.of(new Score().setCourse(ENGLISH).setScore(90)));
-        Mockito.when(scoreRepository.getScore(studentID, 3))
-                .thenReturn(Optional.of(new Score().setCourse(MATH).setScore(80)));
-        Mockito.when(scoreRepository.getScore(studentID, 4))
-                .thenReturn(Optional.of(new Score().setCourse(SCIENCE).setScore(70)));
+                .thenReturn(Optional.empty());
 
         // when & then
-        Assertions.assertThrows(NoSuchStudentException.class, () -> transcriptService.getAverageScore(studentID));
+        Assertions.assertThrows(NoSuchScoreException.class, () -> transcriptService.getAverageScore(studentID));
     }
 
     @Test
