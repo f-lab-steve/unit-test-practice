@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -37,6 +38,7 @@ class TranscriptServiceImplTest {
     @Mock
     private StudentRepository studentRepository;
 
+    @Spy
     @InjectMocks
     private TranscriptServiceImpl transcriptService;
 
@@ -82,9 +84,54 @@ class TranscriptServiceImplTest {
     @Test
     @DisplayName("getAverageScore()에서 studentRepository.getStudent()를 한 번, scoreRepository.getScore()를 student의 course 개수만큼 호출한다.")
     void testGetAverageScore_HappyCase_VerifyNumberOfInteractions_Success() {
-        // TODO:
-        // Hint: Mockito.verify() 사용
-        throw new UnsupportedOperationException("Not implemented yet");
+        // given
+        final int studentID = 1;
+        final Student trey = new Student().setId(studentID).setName("Trey").setMajor("Computer Engineering")
+                .setCourses(List.of(KOREAN, ENGLISH, MATH, SCIENCE));
+
+        Mockito.when(studentRepository.getStudent(1))
+                .thenReturn(Optional.of(trey));
+
+        Mockito.when(scoreRepository.getScore(studentID, 1))
+                .thenReturn(Optional.of(new Score().setCourse(KOREAN).setScore(100)));
+        Mockito.when(scoreRepository.getScore(studentID, 2))
+                .thenReturn(Optional.of(new Score().setCourse(ENGLISH).setScore(90)));
+        Mockito.when(scoreRepository.getScore(studentID, 3))
+                .thenReturn(Optional.of(new Score().setCourse(MATH).setScore(80)));
+        Mockito.when(scoreRepository.getScore(studentID, 4))
+                .thenReturn(Optional.of(new Score().setCourse(SCIENCE).setScore(70)));
+
+        //when
+        final double averageScore = transcriptService.getAverageScore(studentID);
+
+        //then
+        Assertions.assertEquals(85, averageScore);
+
+
+        // given
+        final Student cyh = new Student().setId(studentID).setName("cyh").setMajor("Computer Engineering")
+                .setCourses(List.of(KOREAN, ENGLISH, MATH, SCIENCE));
+
+        Mockito.when(studentRepository.getStudent(1))
+                .thenReturn(Optional.of(cyh));
+
+        Mockito.when(scoreRepository.getScore(studentID, 1))
+                .thenReturn(Optional.of(new Score().setCourse(KOREAN).setScore(100)));
+        Mockito.when(scoreRepository.getScore(studentID, 2))
+                .thenReturn(Optional.of(new Score().setCourse(ENGLISH).setScore(100)));
+        Mockito.when(scoreRepository.getScore(studentID, 3))
+                .thenReturn(Optional.of(new Score().setCourse(MATH).setScore(80)));
+        Mockito.when(scoreRepository.getScore(studentID, 4))
+                .thenReturn(Optional.of(new Score().setCourse(SCIENCE).setScore(80)));
+
+        //when
+        final double averageScore2 = transcriptService.getAverageScore(studentID);
+
+        //then
+        Assertions.assertEquals(90, averageScore2);
+
+        //verify
+        Mockito.verify(transcriptService, Mockito.times(2)).getAverageScore(1);
     }
 
     @Test
