@@ -101,16 +101,13 @@ class TranscriptServiceImplTest {
         Mockito.when(scoreRepository.getScore(studentID, 4))
                 .thenReturn(Optional.of(new Score().setCourse(SCIENCE).setScore(70)));
 
-        //when
-        final double averageScore = transcriptService.getAverageScore(studentID);
-
-        //then
-        Assertions.assertEquals(85, averageScore);
+        //when & then
+        Assertions.assertEquals(85, transcriptService.getAverageScore(studentID));
 
 
         // given
         final Student cyh = new Student().setId(studentID).setName("cyh").setMajor("Computer Engineering")
-                .setCourses(List.of(KOREAN, ENGLISH, MATH, SCIENCE));
+                .setCourses(List.of(KOREAN, ENGLISH, MATH));
 
         Mockito.when(studentRepository.getStudent(1))
                 .thenReturn(Optional.of(cyh));
@@ -118,27 +115,41 @@ class TranscriptServiceImplTest {
         Mockito.when(scoreRepository.getScore(studentID, 1))
                 .thenReturn(Optional.of(new Score().setCourse(KOREAN).setScore(100)));
         Mockito.when(scoreRepository.getScore(studentID, 2))
-                .thenReturn(Optional.of(new Score().setCourse(ENGLISH).setScore(100)));
+                .thenReturn(Optional.of(new Score().setCourse(ENGLISH).setScore(90)));
         Mockito.when(scoreRepository.getScore(studentID, 3))
                 .thenReturn(Optional.of(new Score().setCourse(MATH).setScore(80)));
-        Mockito.when(scoreRepository.getScore(studentID, 4))
-                .thenReturn(Optional.of(new Score().setCourse(SCIENCE).setScore(80)));
 
-        //when
-        final double averageScore2 = transcriptService.getAverageScore(studentID);
+        //when & then
+        Assertions.assertEquals(90, transcriptService.getAverageScore(studentID));
 
-        //then
-        Assertions.assertEquals(90, averageScore2);
 
         //verify
         Mockito.verify(transcriptService, Mockito.times(2)).getAverageScore(1);
+        Mockito.verify(scoreRepository, Mockito.times(1)).getScore(studentID, 4);
     }
 
     @Test
     @DisplayName("scoreRepository로부터 학생의 Score를 하나라도 찾을 수 없는 경우, getAverageScore()는 NoSuchScoreException을 Throw 한다.")
     void testGetAverageScore_ScoreNotExist_ThrowNoSuchScoreException_Error() {
-        // TODO:
-        throw new UnsupportedOperationException("Not implemented yet");
+        // given
+        final int studentID = 1;
+        final Student trey = new Student().setId(studentID).setName("Trey").setMajor("Computer Engineering")
+                .setCourses(List.of(KOREAN, ENGLISH, MATH, SCIENCE));
+
+        Mockito.when(studentRepository.getStudent(1))
+                .thenReturn(Optional.of(trey));
+
+        Mockito.when(scoreRepository.getScore(studentID, 1))
+                .thenReturn(Optional.of(new Score().setCourse(KOREAN).setScore(100)));
+        Mockito.when(scoreRepository.getScore(studentID, 2))
+                .thenReturn(Optional.of(new Score().setCourse(ENGLISH).setScore(90)));
+        Mockito.when(scoreRepository.getScore(studentID, 3))
+                .thenReturn(Optional.of(new Score().setCourse(MATH).setScore(80)));
+        Mockito.when(scoreRepository.getScore(studentID, 4))
+                .thenReturn(Optional.of(new Score().setCourse(SCIENCE).setScore(70)));
+
+        // when & then
+        Assertions.assertThrows(NoSuchStudentException.class, () -> transcriptService.getAverageScore(studentID));
     }
 
     @Test
