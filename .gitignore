@@ -1,3 +1,2 @@
-/.gradle/
-/.idea/
-/build/
+/*
+!src/test/**/service/TranscriptServiceImplTest.java
